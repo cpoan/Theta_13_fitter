@@ -1,0 +1,141 @@
+PARSING CROSS SECTION: ./data/cross_section
+PARSING AVERAGE POWER
+6AD average power
+ 2.09039 2.8791 2.53501 2.56946 2.83214 1.89582
+8AD average power
+ 2.53986 2.50822 2.57171 2.52869 2.56069 2.5129
+7AD average power
+ 2.85591 2.86286 2.41224 2.77725 2.17683 2.79944
+nH period 2 average power
+ 2.57058 2.51827 2.42618 2.62636 2.57415 2.56957
+PARSING AVERAGE POWER END
+PARSING REACTOR SPECTRUM: ./data/LBNL_Huber_v0.txt
+PARSING CANDIDATES
+PARSING CANDIDATES OVER
+PARSING BACKGROUNDS
+PARSING BACKGROUNDS OVER
+PARSING EFFICIENCIES
+PARSING EFFICIENCIES OVER
+PARSING TARGET PROTONS
+PARSING TARGET PROTONS OVER
+Chi2 = Real IBD daily rates AD1 = 636.355 +- 1.33814
+Real IBD daily rates AD2 = 648.546 +- 1.34417
+Real IBD daily rates AD3 = 585.149 +- 1.09385
+Real IBD daily rates AD4 = 72.4542 +- 0.268914
+Real IBD daily rates AD5 = 72.7916 +- 0.269353
+Real IBD daily rates AD6 = 72.1758 +- 0.268342
+Real IBD daily rates AD7 = 72.9213 +- 0.293872
+Real IBD daily rates AD8 = 579.356 +- 1.14814
+1523.9
+Number of fit parameters = 106
+Minuit2Minimizer: Minimize with max-calls 1000000 convergence for edm < 0.001 strategy 1
+Minuit2Minimizer : Valid minimum - status = 0
+FVAL  = 4.50971129608786736
+Edm   = 3.89224648517321256e-07
+Nfcn  = 6204
+Pull_Power_0	  = 0.000565869	 +/-  0.00379306
+Pull_Power_1	  = 0.000504777	 +/-  0.00390091
+Pull_Power_2	  = -0.000285669	 +/-  0.0046076
+Pull_Power_3	  = -0.000223397	 +/-  0.00402859
+Pull_Power_4	  = -0.00025492	 +/-  0.00418522
+Pull_Power_5	  = -0.000307068	 +/-  0.00429297
+Pull_ReleaseEnergyPerFission	  = 1.51343e-07	 +/-  0.00199704
+Pull_Fraction_Reactor_Nuclear_0_0	  = 0.00453923	 +/-  0.0393311
+Pull_Fraction_Reactor_Nuclear_0_1	  = 0.00113822	 +/-  0.0434841
+Pull_Fraction_Reactor_Nuclear_0_2	  = -0.00587531	 +/-  0.0361123
+Pull_Fraction_Reactor_Nuclear_0_3	  = -0.00229322	 +/-  0.0428377
+Pull_Fraction_Reactor_Nuclear_1_0	  = 0.00406193	 +/-  0.0404171
+Pull_Fraction_Reactor_Nuclear_1_1	  = 0.00101893	 +/-  0.0436342
+Pull_Fraction_Reactor_Nuclear_1_2	  = -0.00525127	 +/-  0.0381898
+Pull_Fraction_Reactor_Nuclear_1_3	  = -0.00205456	 +/-  0.0434728
+Pull_Fraction_Reactor_Nuclear_2_0	  = -0.00232117	 +/-  0.0391142
+Pull_Fraction_Reactor_Nuclear_2_1	  = -0.000575034	 +/-  0.0430523
+Pull_Fraction_Reactor_Nuclear_2_2	  = 0.00298357	 +/-  0.0349474
+Pull_Fraction_Reactor_Nuclear_2_3	  = 0.00117039	 +/-  0.0411489
+Pull_Fraction_Reactor_Nuclear_3_0	  = -0.00182424	 +/-  0.0399444
+Pull_Fraction_Reactor_Nuclear_3_1	  = -0.000448735	 +/-  0.0447769
+Pull_Fraction_Reactor_Nuclear_3_2	  = 0.0023522	 +/-  0.0357953
+Pull_Fraction_Reactor_Nuclear_3_3	  = 0.000921607	 +/-  0.042044
+Pull_Fraction_Reactor_Nuclear_4_0	  = -0.00204577	 +/-  0.0414874
+Pull_Fraction_Reactor_Nuclear_4_1	  = -0.0005271	 +/-  0.0447608
+Pull_Fraction_Reactor_Nuclear_4_2	  = 0.00263179	 +/-  0.0384321
+Pull_Fraction_Reactor_Nuclear_4_3	  = 0.00101736	 +/-  0.0425342
+Pull_Fraction_Reactor_Nuclear_5_0	  = -0.0024796	 +/-  0.0393318
+Pull_Fraction_Reactor_Nuclear_5_1	  = -0.000624255	 +/-  0.0435776
+Pull_Fraction_Reactor_Nuclear_5_2	  = 0.00319021	 +/-  0.0350475
+Pull_Fraction_Reactor_Nuclear_5_3	  = 0.00124198	 +/-  0.0416026
+Pull_population_ractor_0	  = 5.08182e-05	 +/-  0.00141768
+Pull_population_ractor_1	  = 4.54706e-05	 +/-  0.00142042
+Pull_population_ractor_2	  = -2.54866e-05	 +/-  0.00141609
+Pull_population_ractor_3	  = -1.99247e-05	 +/-  0.00142589
+Pull_population_ractor_4	  = -2.28369e-05	 +/-  0.00144916
+Pull_population_ractor_5	  = -2.77044e-05	 +/-  0.00143309
+Pull_SNF_0	  = 0.000326793	 +/-  0.00289385
+Pull_SNF_1	  = 0.000291799	 +/-  0.00293473
+Pull_SNF_2	  = -0.000164882	 +/-  0.00306939
+Pull_SNF_3	  = -0.000129119	 +/-  0.00317256
+Pull_SNF_4	  = -0.000147717	 +/-  0.00344134
+Pull_SNF_5	  = -0.000177509	 +/-  0.00315089
+Pull_Acc_0	  = 2.14248e-05	 +/-  0.00997855
+Pull_Acc_1	  = 5.22343e-05	 +/-  0.009978
+Pull_Acc_2	  = 0.000258911	 +/-  0.00997968
+Pull_Acc_3	  = -0.00045995	 +/-  0.00998212
+Pull_Acc_4	  = -0.000132533	 +/-  0.00998843
+Pull_Acc_5	  = 2.56066e-05	 +/-  0.00998699
+Pull_Acc_6	  = 0.000448557	 +/-  0.00998932
+Pull_Acc_7	  = -0.000319032	 +/-  0.00997925
+Pull_LiHe_0	  = 0.041417	 +/-  0.347485
+Pull_LiHe_1	  = -0.0347818	 +/-  0.367893
+Pull_LiHe_2	  = 0.00154386	 +/-  0.42004
+Pull_FastN_0	  = 0.00116175	 +/-  0.12917
+Pull_FastN_1	  = -0.00100635	 +/-  0.129335
+Pull_FastN_2	  = 7.81272e-05	 +/-  0.169558
+Pull_AmC	  = -0.0182164	 +/-  0.421773
+Pull_eps_corr	  = -0.000362921	 +/-  0.0193039
+Pull_eps_uncorr_0	  = 2.988e-05	 +/-  0.00100017
+Pull_eps_uncorr_1	  = 7.31609e-05	 +/-  0.000995363
+Pull_eps_uncorr_2	  = 0.000440884	 +/-  0.00101641
+Pull_eps_uncorr_3	  = -0.000483088	 +/-  0.00111933
+Pull_eps_uncorr_4	  = -0.000148939	 +/-  0.00112009
+Pull_eps_uncorr_5	  = 2.79808e-05	 +/-  0.00111962
+Pull_eps_uncorr_6	  = 0.000608207	 +/-  0.0011321
+Pull_eps_uncorr_7	  = -0.000549224	 +/-  0.00102396
+Pull_eps_multi_0	  = 1.6959e-07	 +/-  9.98614e-05
+Pull_eps_multi_1	  = 4.21412e-07	 +/-  9.98513e-05
+Pull_eps_multi_2	  = 2.52821e-06	 +/-  9.98061e-05
+Pull_eps_multi_3	  = -2.76763e-06	 +/-  9.99309e-05
+Pull_eps_multi_4	  = -8.52789e-07	 +/-  9.99539e-05
+Pull_eps_multi_5	  = 1.6189e-07	 +/-  9.99487e-05
+Pull_eps_multi_6	  = 3.48733e-06	 +/-  9.99384e-05
+Pull_eps_multi_7	  = -3.14574e-06	 +/-  9.97971e-05
+Pull_TargetMass_GdLS_0	  = 0.00067079	 +/-  0.899705
+Pull_TargetMass_GdLS_1	  = 0.001667	 +/-  0.899704
+Pull_TargetMass_GdLS_2	  = 0.111582	 +/-  2.99055
+Pull_TargetMass_GdLS_3	  = -0.0135635	 +/-  0.999825
+Pull_TargetMass_GdLS_4	  = -0.0150291	 +/-  1.89926
+Pull_TargetMass_GdLS_5	  = 0.000643476	 +/-  0.899921
+Pull_TargetMass_GdLS_6	  = 0.0138316	 +/-  0.899877
+Pull_TargetMass_GdLS_7	  = -0.0124687	 +/-  0.899589
+Pull_TargetMass_LS_0	  = 0	 +/-  42
+Pull_TargetMass_LS_1	  = 0	 +/-  42
+Pull_TargetMass_LS_2	  = 0	 +/-  42
+Pull_TargetMass_LS_3	  = 0	 +/-  42
+Pull_TargetMass_LS_4	  = 0	 +/-  42
+Pull_TargetMass_LS_5	  = 0	 +/-  42
+Pull_TargetMass_LS_6	  = 0	 +/-  42
+Pull_TargetMass_LS_7	  = 0	 +/-  42
+Pull_TargetMass_Acrylic_0	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_1	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_2	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_3	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_4	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_5	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_6	  = 0	 +/-  0.005
+Pull_TargetMass_Acrylic_7	  = 0	 +/-  0.005
+Pull_protonDensity_GdLS	  = -1.18279e-07	 +/-  0.00469918
+Pull_protonDensity_LS	  = 0	 +/-  0.006
+Pull_sin2_theta12	  = 0.306998	 +/-  0.0130205
+Pull_delta_m2_21	  = 7.52995e-05	 +/-  1.79561e-06
+Pull_delta_m2_32	  = 0.00243129	 +/-  5.96645e-05
+sin2_2theta13	  = 0.0847709	 +/-  0.00441113
+NORM	  = 0.953375	 +/-  0.0236718

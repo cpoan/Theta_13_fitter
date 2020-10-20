@@ -1,0 +1,14 @@
+for(int i = 0;i<2;i++)
+    for(int j = 0;j<3;j++)
+        for(int k = 0;k<3;k++)
+            delete line_gr1d[i][j][k];
+for(int i = 0;i<2;i++)
+    delete gr1d[i];
+delete pad3;
+delete pad2;
+delete pad1;
+delete c1;
+for(int i = 0;i<3;i++)
+    delete gr2d[i];
+delete grGd;
+delete grFinalPoint;
