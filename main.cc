@@ -125,7 +125,7 @@ const double SystSNF = 0.0038;
 const char* candidates_data[3] = {
     "./data/nGd/candidates.txt",
     "./data/nH/candidates.txt",
-    "./data/unified/candidates.txt"
+    "./data/unified/region0/candidates.txt"
 };
 void parseCandidates(const char* data);
 double R_candidates[8][2];
@@ -133,7 +133,7 @@ double R_candidates[8][2];
 const char* backgrounds_data[3] = {
     "./data/nGd/backgrounds.txt",
     "./data/nH/backgrounds.txt",
-    "./data/unified/backgrounds.final.txt"
+    "./data/unified/region0/backgrounds.final.txt"
 };
 void parseBackgrounds(const char* data);
 double R_Accidentals[8][2];
@@ -148,7 +148,7 @@ double Syst_AmC;
 const char* efficiencies_data[3] = {
     "./data/nGd/efficiencies.txt",
     "./data/nH/efficiencies.txt",
-    "./data/unified/efficiencies.final.txt"
+    "./data/unified/region0/efficiencies.final.txt"
 };
 void parseEfficiencies(const char* data);
 double eps_multi[8];
@@ -984,6 +984,7 @@ void profile_minimizer(ROOT::Math::Minimizer *mini){
     double totalError =  mini->Errors()[104];
     double statError = array_sin2_2theta13[0][1];
     double systError = sqrt(totalError*totalError-statError*statError);
+    cout<<setprecision(3);
     cout<<"Final results of Sin2 2theta13 = "<<sin22theta13<<" +- "<<statError<<"(stat)"<<" +- "<<systError<<"(syst)\n";
     cout<<"Final results of Anorm(reactor neutrino anomaly) = " << mini->X()[105] <<" +- "<< mini->Errors()[105]<<"\n";
 
