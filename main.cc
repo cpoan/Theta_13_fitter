@@ -32,11 +32,12 @@
 #include "TMatrixD.h"
 #include "TArrayD.h"
 using namespace std;
+TFile* outf;
 int norm = 1;
 int debug = 0;
 int debug_average_power = 0;
 int showfinal = 0;
-int draw = 0;
+int draw = 1;
 bool firstRun = true;
 const int Selection = 2;//choose nGd or nH or Unified
 string selectionName[3] = {
@@ -125,7 +126,7 @@ const double SystSNF = 0.0038;
 const char* candidates_data[3] = {
     "./data/nGd/candidates.txt",
     "./data/nH/candidates.txt",
-    "./data/unified/region0/candidates.txt"
+    "./data/unified/region2/candidates.txt"
 };
 void parseCandidates(const char* data);
 double R_candidates[8][2];
@@ -133,7 +134,7 @@ double R_candidates[8][2];
 const char* backgrounds_data[3] = {
     "./data/nGd/backgrounds.txt",
     "./data/nH/backgrounds.txt",
-    "./data/unified/region0/backgrounds.final.txt"
+    "./data/unified/region2/backgrounds.final.txt"
 };
 void parseBackgrounds(const char* data);
 double R_Accidentals[8][2];
@@ -148,7 +149,7 @@ double Syst_AmC;
 const char* efficiencies_data[3] = {
     "./data/nGd/efficiencies.txt",
     "./data/nH/efficiencies.txt",
-    "./data/unified/region0/efficiencies.final.txt"
+    "./data/unified/region2/efficiencies.final.txt"
 };
 void parseEfficiencies(const char* data);
 double eps_multi[8];
@@ -249,6 +250,7 @@ double myOsc(double* x,double* p){
 }
 
 int main(){
+	outf = new TFile("./region2.info.root","RECREATE");
     ///////////////////////////////////////////Correlation matrix
     corrMatrix = new TMatrixD(4,4);
     TArrayD data(16);
@@ -311,7 +313,7 @@ int main(){
             DrawOscillationCurve(mini);
             DrawContour(mini);
         }
-        profile_minimizer(mini);
+        //profile_minimizer(mini);
     }
     //TF1* test = new TF1("",myEff_Prob,0,2000,2);
     //test->SetParameters(2.43e-3,4);
@@ -319,6 +321,7 @@ int main(){
     //ctest->cd();
     //test->Draw();
     //ctest->SaveAs("./Figures/nGd/testEffProb.png");
+    outf->Close();
 };
 
 double fcn(const double* par){
@@ -818,7 +821,7 @@ void initialize_minimizer(ROOT::Math::Minimizer *mini){
 
     mini->SetErrorDef(1.0);
     mini->SetTolerance(0.001);
-    mini->SetPrintLevel(1);
+    mini->SetPrintLevel(2);
     mini->SetStrategy(1);
     mini->SetMaxFunctionCalls(1000000);
     mini->SetMaxIterations(1000000);
@@ -882,7 +885,7 @@ void initialize_minimizer(ROOT::Math::Minimizer *mini){
     mini->SetVariable(idx++,"Pull_sin2_theta12",sin2_theta12[0],sin2_theta12[1]*step_ratio);
     mini->SetVariable(idx++,"Pull_delta_m2_21",delta_m2_21[0],delta_m2_21[1]*step_ratio);
     mini->SetVariable(idx++,"Pull_delta_m2_32",delta_m2_32[0],delta_m2_32[1]*step_ratio);
-    mini->SetVariable(idx++,"sin2_2theta13",0.086,0.0001);
+    mini->SetLowerLimitedVariable(idx++,"sin2_2theta13",0.086,0.0001,0);
     if(norm)
         mini->SetVariable(idx++,"NORM",0.95,0.0001);
     cout<<"Number of fit parameters = "<<idx<<"\n";
@@ -1153,6 +1156,11 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     data[0]->Draw("pSAME");
     data[2]->Draw("pSAME");
 
+    outf->cd();
+    data[0]->Write("gr_EH1");
+    data[1]->Write("gr_EH2");
+    data[2]->Write("gr_EH3");
+
     TF1* fnull = new TF1("","1.0",0,3000);
     TF1* fosc = new TF1("",myOsc,0,3000,0);
     
@@ -1161,6 +1169,7 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     fosc->SetLineWidth(2);
     fnull->Draw("SAME");
     fosc->Draw("SAME");
+    fosc->Write("tf1_osc_curve");
 
     TLegend* lgOsc = new TLegend(0.12,0.12,0.4,0.4); 
     lgOsc->AddEntry(fosc,"Best fit oscillations","l");
@@ -1170,6 +1179,7 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     lgOsc->AddEntry(data[2],"EH3","pl");
     lgOsc->Draw("SAME");
     c2->SaveAs(TString::Format("./Figures/%s/oscillationCurve.png",selectionName[Selection].c_str()));
+    lgOsc->Write("lg_Osc");
 
 
 }
@@ -1217,6 +1227,7 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr2d[0] = new TGraph(npoints,x1[0],x2[0]);
     gr2d[1] = new TGraph(npoints,x1[1],x2[1]);
     gr2d[2] = new TGraph(npoints,x1[2],x2[2]);
+
     gr2d[2]->SetTitle(TString::Format("Confidence level contour of %s analysis;\\sin^{2}2\\theta_{13};A_{norm}",selectionName[Selection].c_str()));
     gr2d[2]->GetXaxis()->CenterTitle(kTRUE);
     gr2d[2]->GetYaxis()->CenterTitle(kTRUE);
@@ -1238,10 +1249,17 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr2d[1]->Draw("lfSAME");
     gr2d[0]->Draw("lfSAME");
     grFinalPoint->Draw("plSAME");
+
+    outf->cd();
+    grFinalPoint->Write("gr_2sin2theta13_Anorm");
+    gr2d[0]->Write("CLsigma1");
+    gr2d[1]->Write("CLsigma2");
+    gr2d[2]->Write("CLsigma3");
     lg->AddEntry(grFinalPoint,TString::Format("(%s)Best fit",selectionName[Selection].c_str()),"pl");
     lg->AddEntry(gr2d[0],"1 #sigma (68\% CL)","f");
     lg->AddEntry(gr2d[1],"2 #sigma (95\% CL)","f");
     lg->AddEntry(gr2d[2],"3 #sigma (99.7\% CL)","f");
+    lg->Write("lg_CL");
     if(Selection==2||Selection==1){
         grGd->Draw("plSAME");
         lg->AddEntry(grGd,"previous nGd","pl");
