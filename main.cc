@@ -43,7 +43,7 @@ const int Selection = 2;//choose nGd or nH or Unified
 string selectionName[3] = {
     "nGd",
     "nH",
-    "unified"
+    "region0"
 };
 ///////////////////////////////////////////Parameters of program needs
 const int N_detectors = 8;
@@ -126,7 +126,7 @@ const double SystSNF = 0.0038;
 const char* candidates_data[3] = {
     "./data/nGd/candidates.txt",
     "./data/nH/candidates.txt",
-    "./data/unified/region2/candidates.txt"
+    "./data/unified/region0/candidates.txt"
 };
 void parseCandidates(const char* data);
 double R_candidates[8][2];
@@ -134,7 +134,7 @@ double R_candidates[8][2];
 const char* backgrounds_data[3] = {
     "./data/nGd/backgrounds.txt",
     "./data/nH/backgrounds.txt",
-    "./data/unified/region2/backgrounds.final.txt"
+    "./data/unified/region0/backgrounds.final.txt"
 };
 void parseBackgrounds(const char* data);
 double R_Accidentals[8][2];
@@ -149,7 +149,7 @@ double Syst_AmC;
 const char* efficiencies_data[3] = {
     "./data/nGd/efficiencies.txt",
     "./data/nH/efficiencies.txt",
-    "./data/unified/region2/efficiencies.final.txt"
+    "./data/unified/region0/efficiencies.final.txt"
 };
 void parseEfficiencies(const char* data);
 double eps_multi[8];
@@ -250,7 +250,7 @@ double myOsc(double* x,double* p){
 }
 
 int main(){
-	outf = new TFile("./region2.info.root","RECREATE");
+	outf = new TFile("./region0.info.root","RECREATE");
     ///////////////////////////////////////////Correlation matrix
     corrMatrix = new TMatrixD(4,4);
     TArrayD data(16);
@@ -313,7 +313,7 @@ int main(){
             DrawOscillationCurve(mini);
             DrawContour(mini);
         }
-        //profile_minimizer(mini);
+        profile_minimizer(mini);
     }
     //TF1* test = new TF1("",myEff_Prob,0,2000,2);
     //test->SetParameters(2.43e-3,4);
@@ -1255,7 +1255,8 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr2d[0]->Write("CLsigma1");
     gr2d[1]->Write("CLsigma2");
     gr2d[2]->Write("CLsigma3");
-    lg->AddEntry(grFinalPoint,TString::Format("(%s)Best fit",selectionName[Selection].c_str()),"pl");
+    //lg->AddEntry(grFinalPoint,TString::Format("(%s)Best fit",selectionName[Selection].c_str()),"pl");
+    lg->AddEntry(grFinalPoint,"Best fit","pl");
     lg->AddEntry(gr2d[0],"1 #sigma (68\% CL)","f");
     lg->AddEntry(gr2d[1],"2 #sigma (95\% CL)","f");
     lg->AddEntry(gr2d[2],"3 #sigma (99.7\% CL)","f");
@@ -1279,8 +1280,8 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     double dChi2[npoints];
     //mini->Scan(104,npoints,s2_2th13,dChi,0.07,0.1);
     //mini->Scan(105,npoints,A,dChi2,0.88,1.03);
-    scanChi2(mini,104,npoints,s2_2th13,dChi,mean-5*sigma,mean+5*sigma);
-    scanChi2(mini,105,npoints,A,dChi2,mean2-5*sigma2,mean2+5*sigma2);
+    scanChi2(mini,104,npoints,s2_2th13,dChi,mean-3*sigma,mean+3*sigma);
+    scanChi2(mini,105,npoints,A,dChi2,mean2-3*sigma2,mean2+3*sigma2);
     //for(int p = 0;p<npoints;p++){
     //    dChi[p]/=6.;
     //    dChi2[p]/=6.;
@@ -1296,7 +1297,7 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr1d[0]->GetYaxis()->SetLabelSize(0.06);
     gr1d[0]->GetXaxis()->SetLabelOffset(999);
     gr1d[0]->GetXaxis()->SetLimits(mean-5*sigma,mean+5*sigma);
-    gr1d[0]->SetMaximum(20);
+    gr1d[0]->SetMaximum(10);
     gr1d[0]->SetMinimum(0);
     gr1d[0]->SetLineWidth(2);
     gr1d[0]->Draw("aplY+");
@@ -1321,7 +1322,7 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr1d[1]->GetXaxis()->SetTitleSize(0.06);
     gr1d[1]->GetXaxis()->SetTitleOffset(0.7);
     gr1d[1]->GetYaxis()->SetLabelOffset(999);
-    gr1d[1]->GetXaxis()->SetLimits(0,20);
+    gr1d[1]->GetXaxis()->SetLimits(0,10);
     gr1d[1]->SetMaximum(mean2+5*sigma2);
     gr1d[1]->SetMinimum(mean2-5*sigma2);
     gr1d[1]->SetLineWidth(2);
@@ -1369,7 +1370,7 @@ void scanChi2(ROOT::Math::Minimizer *mini,unsigned int ivar,unsigned int& nstep,
     else if(Selection==1)
         chi2_min = 6.56;
     else if(Selection==2)
-        chi2_min = 3.72;
+        chi2_min = 5.25;
 
     for(int s = 0;s<nstep;s++){
         x[s] = (xmax-xmin)/(nstep-1)*s+xmin;
