@@ -32,18 +32,17 @@
 #include "TMatrixD.h"
 #include "TArrayD.h"
 using namespace std;
-TFile* outf;
 int norm = 1;
 int debug = 0;
 int debug_average_power = 0;
 int showfinal = 0;
-int draw = 1;
+int draw = 0;
 bool firstRun = true;
 const int Selection = 2;//choose nGd or nH or Unified
 string selectionName[3] = {
     "nGd",
     "nH",
-    "region0"
+    "unified"
 };
 ///////////////////////////////////////////Parameters of program needs
 const int N_detectors = 8;
@@ -68,6 +67,9 @@ const double dist_map[N_detectors][N_reactors] = {
 void parseAveragePower(const char* data);
 const double SystThermalPower = 0.005;
 const char* week_average_beda_data = "./data/WeeklyAvg_P17B_by_Beda.txt";
+const double Days6AD = 217.;
+const double Days8AD = 1524.;
+const double Days7AD = 217.;
 double ThermalPower6AD[N_reactors] = {//GW
     2.082,
     2.874,
@@ -126,7 +128,7 @@ const double SystSNF = 0.0038;
 const char* candidates_data[3] = {
     "./data/nGd/candidates.txt",
     "./data/nH/candidates.txt",
-    "./data/unified/region0/candidates.txt"
+    "./data/unified/candidates.txt"
 };
 void parseCandidates(const char* data);
 double R_candidates[8][2];
@@ -134,7 +136,7 @@ double R_candidates[8][2];
 const char* backgrounds_data[3] = {
     "./data/nGd/backgrounds.txt",
     "./data/nH/backgrounds.txt",
-    "./data/unified/region0/backgrounds.final.txt"
+    "./data/unified/backgrounds.final.txt"
 };
 void parseBackgrounds(const char* data);
 double R_Accidentals[8][2];
@@ -149,7 +151,7 @@ double Syst_AmC;
 const char* efficiencies_data[3] = {
     "./data/nGd/efficiencies.txt",
     "./data/nH/efficiencies.txt",
-    "./data/unified/region0/efficiencies.final.txt"
+    "./data/unified/efficiencies.final.txt"
 };
 void parseEfficiencies(const char* data);
 double eps_multi[8];
@@ -250,7 +252,6 @@ double myOsc(double* x,double* p){
 }
 
 int main(){
-	outf = new TFile("./region0.info.root","RECREATE");
     ///////////////////////////////////////////Correlation matrix
     corrMatrix = new TMatrixD(4,4);
     TArrayD data(16);
@@ -321,7 +322,6 @@ int main(){
     //ctest->cd();
     //test->Draw();
     //ctest->SaveAs("./Figures/nGd/testEffProb.png");
-    outf->Close();
 };
 
 double fcn(const double* par){
@@ -360,15 +360,15 @@ double fcn(const double* par){
                 }
             }else if(Selection==2){
                 if(d==0)
-                    power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower6AD[r]*Days6AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days6AD+Days8AD);
                 else if(d!=6&&d!=7){
                     power[r][d] = 0;
-                    power[r][d]+=ThermalPower6AD[r]*217.;
-                    power[r][d]+=ThermalPower8AD[r]*1524.;
-                    power[r][d]+=ThermalPower7AD[r]*217.;
-                    power[r][d]*=1/(1958.)*(1.+par[r+powerPullIndexBegin]);
+                    power[r][d]+=ThermalPower6AD[r]*Days6AD;
+                    power[r][d]+=ThermalPower8AD[r]*Days8AD;
+                    power[r][d]+=ThermalPower7AD[r]*Days7AD;
+                    power[r][d]*=1/(Days6AD+Days7AD+Days8AD)*(1.+par[r+powerPullIndexBegin]);
                 }else
-                    power[r][d] = (ThermalPower7AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower7AD[r]*Days7AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days7AD+Days8AD);
             }else if(Selection==1){
                 if(d!=6&&d!=7){
                     power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower_nH_period2[r]*404.)*(1.+par[r+powerPullIndexBegin])/(621);
@@ -821,7 +821,7 @@ void initialize_minimizer(ROOT::Math::Minimizer *mini){
 
     mini->SetErrorDef(1.0);
     mini->SetTolerance(0.001);
-    mini->SetPrintLevel(2);
+    mini->SetPrintLevel(1);
     mini->SetStrategy(1);
     mini->SetMaxFunctionCalls(1000000);
     mini->SetMaxIterations(1000000);
@@ -885,7 +885,7 @@ void initialize_minimizer(ROOT::Math::Minimizer *mini){
     mini->SetVariable(idx++,"Pull_sin2_theta12",sin2_theta12[0],sin2_theta12[1]*step_ratio);
     mini->SetVariable(idx++,"Pull_delta_m2_21",delta_m2_21[0],delta_m2_21[1]*step_ratio);
     mini->SetVariable(idx++,"Pull_delta_m2_32",delta_m2_32[0],delta_m2_32[1]*step_ratio);
-    mini->SetLowerLimitedVariable(idx++,"sin2_2theta13",0.086,0.0001,0);
+    mini->SetVariable(idx++,"sin2_2theta13",0.086,0.0001);
     if(norm)
         mini->SetVariable(idx++,"NORM",0.95,0.0001);
     cout<<"Number of fit parameters = "<<idx<<"\n";
@@ -987,7 +987,6 @@ void profile_minimizer(ROOT::Math::Minimizer *mini){
     double totalError =  mini->Errors()[104];
     double statError = array_sin2_2theta13[0][1];
     double systError = sqrt(totalError*totalError-statError*statError);
-    cout<<setprecision(3);
     cout<<"Final results of Sin2 2theta13 = "<<sin22theta13<<" +- "<<statError<<"(stat)"<<" +- "<<systError<<"(syst)\n";
     cout<<"Final results of Anorm(reactor neutrino anomaly) = " << mini->X()[105] <<" +- "<< mini->Errors()[105]<<"\n";
 
@@ -1156,11 +1155,6 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     data[0]->Draw("pSAME");
     data[2]->Draw("pSAME");
 
-    outf->cd();
-    data[0]->Write("gr_EH1");
-    data[1]->Write("gr_EH2");
-    data[2]->Write("gr_EH3");
-
     TF1* fnull = new TF1("","1.0",0,3000);
     TF1* fosc = new TF1("",myOsc,0,3000,0);
     
@@ -1169,7 +1163,6 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     fosc->SetLineWidth(2);
     fnull->Draw("SAME");
     fosc->Draw("SAME");
-    fosc->Write("tf1_osc_curve");
 
     TLegend* lgOsc = new TLegend(0.12,0.12,0.4,0.4); 
     lgOsc->AddEntry(fosc,"Best fit oscillations","l");
@@ -1179,7 +1172,6 @@ void DrawOscillationCurve(ROOT::Math::Minimizer* mini){
     lgOsc->AddEntry(data[2],"EH3","pl");
     lgOsc->Draw("SAME");
     c2->SaveAs(TString::Format("./Figures/%s/oscillationCurve.png",selectionName[Selection].c_str()));
-    lgOsc->Write("lg_Osc");
 
 
 }
@@ -1227,7 +1219,6 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr2d[0] = new TGraph(npoints,x1[0],x2[0]);
     gr2d[1] = new TGraph(npoints,x1[1],x2[1]);
     gr2d[2] = new TGraph(npoints,x1[2],x2[2]);
-
     gr2d[2]->SetTitle(TString::Format("Confidence level contour of %s analysis;\\sin^{2}2\\theta_{13};A_{norm}",selectionName[Selection].c_str()));
     gr2d[2]->GetXaxis()->CenterTitle(kTRUE);
     gr2d[2]->GetYaxis()->CenterTitle(kTRUE);
@@ -1249,18 +1240,10 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr2d[1]->Draw("lfSAME");
     gr2d[0]->Draw("lfSAME");
     grFinalPoint->Draw("plSAME");
-
-    outf->cd();
-    grFinalPoint->Write("gr_2sin2theta13_Anorm");
-    gr2d[0]->Write("CLsigma1");
-    gr2d[1]->Write("CLsigma2");
-    gr2d[2]->Write("CLsigma3");
-    //lg->AddEntry(grFinalPoint,TString::Format("(%s)Best fit",selectionName[Selection].c_str()),"pl");
-    lg->AddEntry(grFinalPoint,"Best fit","pl");
+    lg->AddEntry(grFinalPoint,TString::Format("(%s)Best fit",selectionName[Selection].c_str()),"pl");
     lg->AddEntry(gr2d[0],"1 #sigma (68\% CL)","f");
     lg->AddEntry(gr2d[1],"2 #sigma (95\% CL)","f");
     lg->AddEntry(gr2d[2],"3 #sigma (99.7\% CL)","f");
-    lg->Write("lg_CL");
     if(Selection==2||Selection==1){
         grGd->Draw("plSAME");
         lg->AddEntry(grGd,"previous nGd","pl");
@@ -1280,8 +1263,8 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     double dChi2[npoints];
     //mini->Scan(104,npoints,s2_2th13,dChi,0.07,0.1);
     //mini->Scan(105,npoints,A,dChi2,0.88,1.03);
-    scanChi2(mini,104,npoints,s2_2th13,dChi,mean-3*sigma,mean+3*sigma);
-    scanChi2(mini,105,npoints,A,dChi2,mean2-3*sigma2,mean2+3*sigma2);
+    scanChi2(mini,104,npoints,s2_2th13,dChi,mean-5*sigma,mean+5*sigma);
+    scanChi2(mini,105,npoints,A,dChi2,mean2-5*sigma2,mean2+5*sigma2);
     //for(int p = 0;p<npoints;p++){
     //    dChi[p]/=6.;
     //    dChi2[p]/=6.;
@@ -1297,7 +1280,7 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr1d[0]->GetYaxis()->SetLabelSize(0.06);
     gr1d[0]->GetXaxis()->SetLabelOffset(999);
     gr1d[0]->GetXaxis()->SetLimits(mean-5*sigma,mean+5*sigma);
-    gr1d[0]->SetMaximum(10);
+    gr1d[0]->SetMaximum(20);
     gr1d[0]->SetMinimum(0);
     gr1d[0]->SetLineWidth(2);
     gr1d[0]->Draw("aplY+");
@@ -1322,7 +1305,7 @@ void DrawContour(ROOT::Math::Minimizer* mini){
     gr1d[1]->GetXaxis()->SetTitleSize(0.06);
     gr1d[1]->GetXaxis()->SetTitleOffset(0.7);
     gr1d[1]->GetYaxis()->SetLabelOffset(999);
-    gr1d[1]->GetXaxis()->SetLimits(0,10);
+    gr1d[1]->GetXaxis()->SetLimits(0,20);
     gr1d[1]->SetMaximum(mean2+5*sigma2);
     gr1d[1]->SetMinimum(mean2-5*sigma2);
     gr1d[1]->SetLineWidth(2);
@@ -1370,7 +1353,7 @@ void scanChi2(ROOT::Math::Minimizer *mini,unsigned int ivar,unsigned int& nstep,
     else if(Selection==1)
         chi2_min = 6.56;
     else if(Selection==2)
-        chi2_min = 5.25;
+        chi2_min = 3.72;
 
     for(int s = 0;s<nstep;s++){
         x[s] = (xmax-xmin)/(nstep-1)*s+xmin;
@@ -1424,15 +1407,15 @@ void finalFCN(const double* par){
                 }
             }else if(Selection==2){
                 if(d==0)
-                    power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower6AD[r]*Days6AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days6AD+Days8AD);
                 else if(d!=6&&d!=7){
                     power[r][d] = 0;
-                    power[r][d]+=ThermalPower6AD[r]*217.;
-                    power[r][d]+=ThermalPower8AD[r]*1524.;
-                    power[r][d]+=ThermalPower7AD[r]*217.;
-                    power[r][d]*=1/(1958.)*(1.+par[r+powerPullIndexBegin]);
+                    power[r][d]+=ThermalPower6AD[r]*Days6AD;
+                    power[r][d]+=ThermalPower8AD[r]*Days8AD;
+                    power[r][d]+=ThermalPower7AD[r]*Days7AD;
+                    power[r][d]*=1/(Days6AD+Days7AD+Days8AD)*(1.+par[r+powerPullIndexBegin]);
                 }else
-                    power[r][d] = (ThermalPower7AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower7AD[r]*Days7AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days7AD+Days8AD);
             }else if(Selection==1){
                 if(d!=6&&d!=7){
                     power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower_nH_period2[r]*404.)*(1.+par[r+powerPullIndexBegin])/(621);
@@ -1614,15 +1597,15 @@ double normalSum(int det){
                 }
             }else if(Selection==2){
                 if(d==0)
-                    power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower6AD[r]*Days6AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days6AD+Days8AD);
                 else if(d!=6&&d!=7){
                     power[r][d] = 0;
-                    power[r][d]+=ThermalPower6AD[r]*217.;
-                    power[r][d]+=ThermalPower8AD[r]*1524.;
-                    power[r][d]+=ThermalPower7AD[r]*217.;
-                    power[r][d]*=1/(1958.)*(1.+par[r+powerPullIndexBegin]);
+                    power[r][d]+=ThermalPower6AD[r]*Days6AD;
+                    power[r][d]+=ThermalPower8AD[r]*Days8AD;
+                    power[r][d]+=ThermalPower7AD[r]*Days7AD;
+                    power[r][d]*=1/(Days6AD+Days7AD+Days8AD)*(1.+par[r+powerPullIndexBegin]);
                 }else
-                    power[r][d] = (ThermalPower7AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower7AD[r]*Days7AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days7AD+Days8AD);
             }else if(Selection==1){
                 if(d!=6&&d!=7){
                     power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower_nH_period2[r]*404.)*(1.+par[r+powerPullIndexBegin])/(621);
@@ -1782,15 +1765,15 @@ double effSum(double L, int det){
                 }
             }else if(Selection==2){
                 if(d==0)
-                    power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower6AD[r]*Days6AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days6AD+Days8AD);
                 else if(d!=6&&d!=7){
                     power[r][d] = 0;
-                    power[r][d]+=ThermalPower6AD[r]*217.;
-                    power[r][d]+=ThermalPower8AD[r]*1524.;
-                    power[r][d]+=ThermalPower7AD[r]*217.;
-                    power[r][d]*=1/(1958.)*(1.+par[r+powerPullIndexBegin]);
+                    power[r][d]+=ThermalPower6AD[r]*Days6AD;
+                    power[r][d]+=ThermalPower8AD[r]*Days8AD;
+                    power[r][d]+=ThermalPower7AD[r]*Days7AD;
+                    power[r][d]*=1/(Days6AD+Days7AD+Days8AD)*(1.+par[r+powerPullIndexBegin]);
                 }else
-                    power[r][d] = (ThermalPower7AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower7AD[r]*Days7AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days7AD+Days8AD);
             }else if(Selection==1){
                 if(d!=6&&d!=7){
                     power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower_nH_period2[r]*404.)*(1.+par[r+powerPullIndexBegin])/(621);
@@ -1940,15 +1923,15 @@ double oscSum(double L){
                 }
             }else if(Selection==2){
                 if(d==0)
-                    power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower6AD[r]*Days6AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days6AD+Days8AD);
                 else if(d!=6&&d!=7){
                     power[r][d] = 0;
-                    power[r][d]+=ThermalPower6AD[r]*217.;
-                    power[r][d]+=ThermalPower8AD[r]*1524.;
-                    power[r][d]+=ThermalPower7AD[r]*217.;
-                    power[r][d]*=1/(1958.)*(1.+par[r+powerPullIndexBegin]);
+                    power[r][d]+=ThermalPower6AD[r]*Days6AD;
+                    power[r][d]+=ThermalPower8AD[r]*Days8AD;
+                    power[r][d]+=ThermalPower7AD[r]*Days7AD;
+                    power[r][d]*=1/(Days6AD+Days7AD+Days8AD)*(1.+par[r+powerPullIndexBegin]);
                 }else
-                    power[r][d] = (ThermalPower7AD[r]*217.+ThermalPower8AD[r]*1524.)*(1.+par[r+powerPullIndexBegin])/(1524.+217.);
+                    power[r][d] = (ThermalPower7AD[r]*Days7AD+ThermalPower8AD[r]*Days8AD)*(1.+par[r+powerPullIndexBegin])/(Days7AD+Days8AD);
             }else if(Selection==1){
                 if(d!=6&&d!=7){
                     power[r][d] = (ThermalPower6AD[r]*217.+ThermalPower_nH_period2[r]*404.)*(1.+par[r+powerPullIndexBegin])/(621);
